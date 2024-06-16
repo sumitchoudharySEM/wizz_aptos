@@ -2,7 +2,7 @@ module wizz_addr::wizz {
 
     use std::string::{String, length};
     use std::vector;
-    use aptos_std::table::{Self, Table};
+    //use aptos_std::table::{Self, Table};
     use aptos_framework::signer;
     use aptos_framework::object;
 
@@ -43,7 +43,7 @@ module wizz_addr::wizz {
     }
 
     // Initialize a new profile.
-    public entry fun create_profile(username: String, full_name: String, bio:String, profile_image_ref:String, account: &signer) {
+    public entry fun create_profile(username: String, full_name: String, bio:String, profile_image_ref:String, account: &signer) acquires UsernameTable, ProfileTable {
 
         assert!(length(&username) > 0, 01);
         assert!(length(&full_name) > 0, 02);
@@ -52,7 +52,7 @@ module wizz_addr::wizz {
         //assert!(vector::contains(&username_table.usernames, &username) == false, 05);
 
         let signer_address = signer::address_of(account);
-        let profile_Table = borrow_global_mut<ProfileTable>(signer_address);
+        let profile_table = borrow_global_mut<ProfileTable>(signer_address);
         let username_table = borrow_global_mut<UsernameTable>(signer_address);
 
         // let profile_uid = object::new(ctx);
