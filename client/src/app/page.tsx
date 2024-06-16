@@ -1,113 +1,332 @@
-import Image from "next/image";
+"use client";
+
+import {
+  PACKAGE_ID,
+  PROFILE_TABLE_ID,
+  PINATA_JWT,
+  NEXT_PUBLIC_GATEWAY_URL,
+  USERNAME_TABLE,
+} from "./constants";
+import { toast } from "react-toastify";
+import { useState, useEffect } from "react";
+import { redirect } from "next/navigation";
+
+import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
+import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design";
+import {
+  useWallet,
+  InputTransactionData,
+} from "@aptos-labs/wallet-adapter-react";
+
+
+// import { useSignAndExecuteTransactionBlock } from "@mysten/dapp-kit";
+// import { TransactionBlock } from "@mysten/sui.js/transactions";
+// import {
+//   ConnectButton,
+//   useCurrentAccount,
+//   useSuiClientQuery,
+// } from "@mysten/dapp-kit";
+
 
 export default function Home() {
+  const { account, signAndSubmitTransaction } = useWallet();
+  // const account = useCurrentAccount();
+  // const { mutate: execCreateProf } = useSignAndExecuteTransactionBlock();
+  const [address, setAddress] = useState("");
+  const [profileObjectId, setProfileObjectId] = useState("");
+  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [bio, setbio] = useState("");
+  const [selectedFile, setSelectedFile]: any = useState();
+  const [preview, setPreview]: any = useState();
+  const [imageCID, setImageCID] = useState("");
+
+  function changeHandler(e: any) {
+    setPreview(URL.createObjectURL(e.target.files[0]));
+    setSelectedFile(e.target.files[0]);
+  }
+
+  ////////////////////////////////////////////////////////////////////// 
+
+
+  // const handleSubmission = async () => {
+  //   try {
+  //     console.log(selectedFile);
+  //     const formData = new FormData();
+  //     formData.append("file", selectedFile);
+  //     const metadata = JSON.stringify({
+  //       name: "File name",
+  //     });
+  //     formData.append("pinataMetadata", metadata);
+
+  //     const options = JSON.stringify({
+  //       cidVersion: 0,
+  //     });
+  //     formData.append("pinataOptions", options);
+
+  //     const res = await fetch(
+  //       "https://api.pinata.cloud/pinning/pinFileToIPFS",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           Authorization: `Bearer ${PINATA_JWT}`,
+  //         },
+  //         body: formData,
+  //       }
+  //     );
+  //     const resData = await res.json();
+  //     setImageCID(resData.IpfsHash); // Update state
+  //     console.log("image response", resData.IpfsHash);
+  //     return resData.IpfsHash; // Return the CID
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw error; // Ensure errors are thrown to be caught by the caller
+  //   }
+  // };
+
+  // const { data, isLoading, isError, error, refetch } = useSuiClientQuery(
+  //   "getOwnedObjects",
+  //   {
+  //     owner: address,
+  //     limit: 1,
+  //     filter: {
+  //       MatchAll: [
+  //         {
+  //           StructType: `${PACKAGE_ID}::profilecontract::Profile`,
+  //         },
+  //         {
+  //           AddressOwner: address,
+  //         },
+  //       ],
+  //     },
+  //     options: {
+  //       showOwner: true,
+  //       showType: true,
+  //       showContent: true,
+  //     },
+  //   },
+  //   { queryKey: ["Profile"] }
+  // );
+
+  // console.log("error hai", isError);
+  // console.log(
+  //   "content profile:",
+  //   data && data.data && data.data.length > 0
+  //     ? data.data[0].data?.content?.fields.full_name
+  //     : null
+  // );
+
+  // useEffect(() => {
+  //   if (account) {
+  //     setAddress(account.address);
+  //     data && data.data && data.data.length > 0 && data.data[0].data
+  //       ? setProfileObjectId(data.data[0].data?.objectId)
+  //       : setProfileObjectId("");
+  //   } else {
+  //     setAddress("");
+  //   }
+  // }, [account, data]);
+
+  // useEffect(() => {
+  //   console.log("profileObjectId", profileObjectId);
+  //   if (account && account.address) {
+  //     if (profileObjectId !== "") {
+  //       redirect("/feeds");
+  //     }
+  //   }
+  // }, [profileObjectId, account]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <>
+      <div className="flex jus justify-center h-[100vh] width-[100vw] align-middle  lg:hidden">
+        <h1 className=" m-auto p-6 text-center">Currently, Wizz UI works only with large screen devices.</h1>
+      </div>
+      <div className="hidden  h-[80%] sm:hidden md:hidden lg:flex">
+        <div className="w-full h-[100vh] flex-[0.7]  flex flex-col justify-center  align-middle p-32">
+          <div className="flex justify-between w-full ">
+            <div className="m-4">
+              <div className="text-white text-3xl font-bold">
+                Create your account | Login
+              </div>
+              <div className="text-white">get started with wizz</div>
+            </div>
+            <div>
+              <div className="w-48">
+                <div className="space-y-6  py-4 bottom-0 flex flex-col ">
+                <WalletSelector />
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* {account && account.address && profileObjectId == "" ? (
+            <>
+              <div className="flex md:flex-row flex-col">
+                <input
+                  type="text"
+                  onChange={(e) => setName(e.target.value)}
+                  className="appearance-none block w-full bg-[#34374D]  text-white rounded-xl py-4 px-4 m-4 leading-tight focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Display Name"
+                />
+                <input
+                  onChange={(e) => setUsername(e.target.value)}
+                  type="text"
+                  className="appearance-none block w-full bg-[#34374D]  text-white rounded-xl py-4 px-4 m-4 leading-tight focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Username"
+                />
+              </div>
+              <div className="flex">
+                <input
+                  onChange={(e) => setbio(e.target.value)}
+                  className="appearance-none block w-full bg-[#34374D]  text-white rounded-xl py-4 px-4 m-4 leading-tight focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Write a crazy bio"
+                />
+              </div>
+              <div className="flex md:flex-row flex-col">
+                <input
+                  type="file"
+                  onChange={changeHandler}
+                  className="appearance-none block w-full bg-[#34374D]  text-white rounded-xl py-4 px-4 m-4 leading-tight focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Choose Profile Image"
+                />
+              </div>
+              <div className="w-[30%] m-4">
+                <div className="space-y-6 py-4 bottom-0 flex flex-col ">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const cid = await handleSubmission();
+                        console.log("CID", cid);
+
+                        const txb = new TransactionBlock();
+                        const [prof] = txb.moveCall({
+                          target: `${PACKAGE_ID}::profilecontract::create_profile`,
+                          arguments: [
+                            txb.object(PROFILE_TABLE_ID),
+                            txb.object(USERNAME_TABLE),
+                            txb.pure.string(username),
+                            txb.pure.string(name),
+                            txb.pure.string(bio),
+                            txb.pure.string(cid),
+                          ],
+                        });
+                        execCreateProf(
+                          {
+                            transactionBlock: txb,
+                          },
+                          {
+                            onError: (err) => {
+                              toast.error(err.message);
+                            },
+                            onSuccess: (result) => {
+                              toast.success(`Digest: ${result.digest}`);
+                              console.log("result of transaction:", result);
+                              console.log("prof:", [prof]);
+                              setTimeout(() => {
+                                window.location.reload();
+                              } , 1000)
+                            },
+                          }
+                        );
+                      } catch (error) {
+                        console.error("Error during submission:", error);
+                      }
+                    }}
+                    className="bg-[#7501E9] py-3  w-[90%] text text-white border-none  rounded-xl"
+                  >
+                    Create Account
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <></>
+          )} */}
+        </div>
+        <div className="flex-[0.5] h-[100vh] ">
+          <div className="  bg-[url(https://w0.peakpx.com/wallpaper/914/142/HD-wallpaper-cool-blue-purple-abstract-dark-glow-loveurhunny-pink.jpg)] top-[6rem] right-[16rem] flex flex-col justify-between h-[100vh] bg-cover pl-20">
+            <div className="h-36 w-36 mt-60">
+              {account &&
+              account.address &&
+              preview &&
+              preview !== null &&
+              preview !== "" &&
+              preview !== "null" &&
+              preview !== undefined ? (
+                <img
+                  className="rounded-full h-36 w-36 object-cover"
+                  src={preview}
+                />
+              ) : (
+                <></>
+              )}
+            </div>
+            <div className="text-white pb-20">
+              <div className="font-medium text-lg text-opacity-60">
+                Welcome to
+              </div>
+              <div className="font-bold text-2xl text-opacity-90">Wizz</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      {/* <div className="connectwalletbtn">
+        <ConnectButton />
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className="flex flex-col items-center justify-center">
+        <h1 className="text-3xl font-bold">Hello There</h1>
+        <p className="text-lg">
+          Your account: {account ? account.address : <>No Wallet Connected</>}
+        </p>
+        <p className="text-lg">Package Id: {PACKAGE_ID}</p>
       </div>
-    </main>
+      <div className="flex flex-col items-center justify-center mt-4">
+      {profileObjectId == "" ? <>
+        <h1 className="text-3xl font-bold">Create Your Profile</h1>
+        <input type="text" onChange={(e) => setName(e.target.value)} placeholder="Your Name" />
+        <input type="text" onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
+        {account ? (
+          <button
+            onClick={() => {
+              const txb = new TransactionBlock();
+              const [prof] = txb.moveCall({
+                target: `${PACKAGE_ID}::profilecontract::create_profile`,
+                arguments: [
+                  txb.object(PROFILE_TABLE_ID),
+                  txb.pure.string(username),
+                  txb.pure.string(name),
+                ],
+              });
+              execCreateProf(
+                {
+                  transactionBlock: txb,
+                },
+                {
+                  onError: (err) => {
+                    toast.error(err.message);
+                  },
+                  onSuccess: (result) => {
+                    toast.success(`Digest: ${result.digest}`);
+                    console.log("result of transaction:", result);
+                    console.log("prof:", [prof]);
+                  },
+                }
+              );
+            }}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Create Profile
+          </button>
+        ) : (
+          <>No Wallet Connected</>
+        )} </>
+         : <>
+          <h1 className="text-3xl font-bold">Profile Created Just Move on</h1>
+         <p>Profile ObjectId : {profileObjectId}</p>
+         </>
+        }
+        
+      </div> */}
+    </>
   );
 }
