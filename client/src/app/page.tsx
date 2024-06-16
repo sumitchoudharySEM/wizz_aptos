@@ -1,11 +1,9 @@
 "use client";
 
 import {
-  PACKAGE_ID,
-  PROFILE_TABLE_ID,
+  MODULEADDRESS,
   PINATA_JWT,
   NEXT_PUBLIC_GATEWAY_URL,
-  USERNAME_TABLE,
 } from "./constants";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
@@ -22,9 +20,8 @@ import { Aptos } from "@aptos-labs/ts-sdk";
 const aptos = new Aptos();
 
 export default function Home() {
+
   const { account, signAndSubmitTransaction } = useWallet();
-  const moduleAddress =
-    "0x7526d5a6bd74a678f27d302f71301c3cdea37f7d1149aae607b35e5d683cea94";
   const [accountHasProfile, setAccountHasProfile] = useState(false);
   const [user, setUser] = useState({
     name: "",
@@ -33,24 +30,19 @@ export default function Home() {
   });
   const [selectedFile, setSelectedFile]: any = useState();
   const [preview, setPreview]: any = useState();
-  const [name, setName] = useState<string>("sumit");
-  const [username, setUsername] = useState<string>("sumit");
-  const [bio, setBio] = useState<string>("sumit");
-  const [cid, setCid] = useState<string>("sumit");
 
   function changeHandler(e: any) {
     setPreview(URL.createObjectURL(e.target.files[0]));
     setSelectedFile(e.target.files[0]);
   }
 
-  //////////////////////////////////////////////////////////////////////
   // GET PROFILE OBJECT ID
   const fetchList = async () => {
     if (!account) return [];
     try {
       const ProfileResource = await aptos.getAccountResource({
         accountAddress: account?.address,
-        resourceType: `${moduleAddress}::wizz::Profile`,
+        resourceType: `${MODULEADDRESS}::wizz::Profile`,
       });
       setAccountHasProfile(true);
       console.log("ProfileResource", ProfileResource);
@@ -168,17 +160,18 @@ export default function Home() {
                       if (!account) return;
                       try {
                         // const cid = await handleSubmission();
-                        // const cid = "QmRzavDxW1zWXrP3W8mw4jCnVPvZxe1HZvbzcE167Tw1kJ";
+                        const cid = "QmRzavDxW1zWXrP3W8mw4jCnVPvZxe1HZvbzcE167Tw1kJ";
                         console.log("CID", cid);
 
                         const transaction: InputTransactionData = {
                           data: {
-                            function: `0x7526d5a6bd74a678f27d302f71301c3cdea37f7d1149aae607b35e5d683cea94::wizz::create_profile`,
+                            function: `${MODULEADDRESS}::wizz::create_profile`,
                             functionArguments: [
-                              "sumit",
-                              "sumit",
-                              "sumit",
-                              "sumit",
+                              MODULEADDRESS,
+                              user.name,
+                              user.username,
+                              user.bio,
+                              cid,
                             ],
                           },
                         };
