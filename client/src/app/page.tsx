@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
 import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design";
+
 import {
   useWallet,
   InputTransactionData,
@@ -37,7 +38,7 @@ export default function Home() {
   }
 
   // GET PROFILE OBJECT ID
-  const fetchList = async () => {
+  const fetchUserProfile = async () => {
     if (!account) return [];
     try {
       const ProfileResource = await aptos.getAccountResource({
@@ -86,13 +87,13 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchList();
+    fetchUserProfile();
   }, [account?.address]);
 
   useEffect(() => {
     console.log("accountHasProfile", accountHasProfile);
     if (account && account.address && accountHasProfile == true) {
-      redirect("/feeds");
+      // redirect("/feeds");
     }
   }, [accountHasProfile, account?.address]);
 
