@@ -2,9 +2,9 @@ module wizz_addr::wizz {
 
     use std::string::{String, length};
     use std::vector;
-    //use aptos_std::table::{Self, Table};
     use aptos_framework::signer;
     use aptos_framework::object;
+    use aptos_std::table::{Self, Table};
 
 
     // Struct to represent a user profile.
@@ -18,6 +18,15 @@ module wizz_addr::wizz {
         followings: vector<address>
     }
 
+    // Struct to represent a post.
+    struct Post has  store, copy, drop{
+        post_id : u64,
+        owner : address,
+        content : String,
+        image_ref : String,
+        likes : u64,
+    }
+
     // Global table to store all usernames.
     struct UsernameTable has key {
        usernames: vector<String>,
@@ -28,9 +37,15 @@ module wizz_addr::wizz {
         profile_addresses: vector<address>,
     }
 
-    const NAME: vector<u8> = b"MyAwesomeObject";
+    // Global table to store all posts.
+    struct PostTable has key {
+        posts: Table<u64, Post>,
+        post_counter : u64,
+    }
 
-    // Initialize the ProfileTable. This should be called once during deployment.
+    const NAME: vector<u8> = b"Object";
+
+    // Initialize the Tables
     public entry fun init(account: &signer) {
         let profile_table = ProfileTable {
             profile_addresses: vector::empty<address>(),
@@ -38,8 +53,13 @@ module wizz_addr::wizz {
         let username_table = UsernameTable {
             usernames: vector::empty<String>(),
         };
+        let post_table = PostTable {
+            posts: table::new(),
+            post_counter: 0,
+        };
         move_to(account, profile_table);
         move_to(account, username_table);
+        move_to(account, post_table);
     }
 
     // Initialize a new profile.
@@ -67,9 +87,59 @@ module wizz_addr::wizz {
             followings: vector::empty<address>(),
         };
 
-        vector::push_back(&mut profile_table.profile_addresses, profile_id);
+        vector::push_back(&mut profile_table.profile_addresses, signer_address);
         vector::push_back(&mut username_table.usernames, username);
         move_to(account, profile);
+    }
+
+    // Follow a profile.
+    public entry fun follow_profile(account: &signer, profile_to_follow: address) acquires Profile{
+        let follower_address = signer::address_of(account);
+        let profile = borrow_global_mut<Profile>(follower_address);
+        vector::push_back(&mut profile.followings, profile_to_follow);
+    }
+
+    // Unfollow a profile.
+    public entry fun unfollow_profile(account: &signer, profile_to_unfollow: address) {
+        let follower_address = signer::address_of(account);
+        let profile = borrow_global_mut<Profile>(follower_address);
+        
+        let len = vector::length(followings);
+        let i = 0;
+        while (i < len) {
+            if (vector::borrow(followings, i) == profile_id_to_unfollow) {
+                vector::remove(followings, i);
+                break
+            };
+            i = i + 1;
+        };
+    }
+
+    // Create a new post.
+    public entry fun create_post(account: &signer, contract_owner: address, content: String, image_ref: String) acquires PostTable {
+        assert!(length(&content) > 0, 05);
+
+        let post_table = borrow_global_mut<PostTable>(contract_owner);
+        let post_counter = post_table.post_counter;
+        let post_id = post_counter + 1;
+
+        let post: Post = Post {
+            post_id,
+            owner: signer::address_of(account),
+            content,
+            image_ref,
+            likes: 0,
+        };
+
+        table::upsert(&mut post_table.posts, post_id, post);
+        post_table.post_counter = post_id;
+    }
+
+    // Like a post.
+    public entry fun like_post(account: &signer, contract_owner: address, post_id: u64) acquires PostTable {
+        let post_table = borrow_global_mut<PostTable>(contract_owner);
+        let post = table::get_mut(&mut post_table.posts, post_id);
+        post.likes += 1;
     }
 
 }

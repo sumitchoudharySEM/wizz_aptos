@@ -169,8 +169,8 @@ export default function Home() {
                             function: `${MODULEADDRESS}::wizz::create_profile`,
                             functionArguments: [
                               MODULEADDRESS,
-                              user.name,
                               user.username,
+                              user.name,
                               user.bio,
                               cid,
                             ],
