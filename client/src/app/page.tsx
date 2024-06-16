@@ -17,6 +17,9 @@ import {
   useWallet,
   InputTransactionData,
 } from "@aptos-labs/wallet-adapter-react";
+import { Aptos } from "@aptos-labs/ts-sdk";
+
+const aptos = new Aptos();
 
 
 // import { useSignAndExecuteTransactionBlock } from "@mysten/dapp-kit";
@@ -29,10 +32,13 @@ import {
 
 
 export default function Home() {
+
+
   const { account, signAndSubmitTransaction } = useWallet();
-  // const account = useCurrentAccount();
+  const moduleAddress = "0xb50f46b6344af99dd208f35e780b7803ccbfb4a626389e139f2215afb70a1e56";
   // const { mutate: execCreateProf } = useSignAndExecuteTransactionBlock();
   const [address, setAddress] = useState("");
+  const [accountHasProfile, setAccountHasProfile] = useState(false);
   const [profileObjectId, setProfileObjectId] = useState("");
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
@@ -47,6 +53,20 @@ export default function Home() {
   }
 
   ////////////////////////////////////////////////////////////////////// 
+  // GET PROFILE OBJECT ID
+  const fetchList = async () => {
+    if (!account) return [];
+    try {
+      const todoListResource = await aptos.getAccountResource({
+        accountAddress: account?.address,
+        resourceType: `${moduleAddress}::wizz::Profile`,
+      });
+      setAccountHasProfile(true);
+      console.log("todoListResource", todoListResource);
+    } catch (e: any) {
+      setAccountHasProfile(false);
+    }
+  };
 
 
   // const handleSubmission = async () => {
@@ -135,6 +155,10 @@ export default function Home() {
   //     }
   //   }
   // }, [profileObjectId, account]);
+
+  useEffect(() => {
+    fetchList();
+  }, [account?.address]);
 
   return (
     <>
