@@ -35,7 +35,7 @@ export default function Home() {
 
 
   const { account, signAndSubmitTransaction } = useWallet();
-  const moduleAddress = "0xb50f46b6344af99dd208f35e780b7803ccbfb4a626389e139f2215afb70a1e56";
+  const moduleAddress = "0x7526d5a6bd74a678f27d302f71301c3cdea37f7d1149aae607b35e5d683cea94";
   // const { mutate: execCreateProf } = useSignAndExecuteTransactionBlock();
   const [address, setAddress] = useState("");
   const [accountHasProfile, setAccountHasProfile] = useState(false);

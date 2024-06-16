@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-wizz_addr='de756d9f7faba7bbccced3cd67392586def5b1efab311acc9be4d70e2b08212f'
+wizz_addr='7526d5a6bd74a678f27d302f71301c3cdea37f7d1149aae607b35e5d683cea94'
 
 [dev-addresses]
 

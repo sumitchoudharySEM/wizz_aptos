@@ -8,7 +8,7 @@ module wizz_addr::wizz {
 
 
     // Struct to represent a user profile.
-    struct Profile has key {
+    struct Profile has key, store {
         profile_id: address,
         username: String,
         full_name: String,
@@ -43,7 +43,7 @@ module wizz_addr::wizz {
     }
 
     // Initialize a new profile.
-    public entry fun create_profile(username: String, full_name: String, bio:String, profile_image_ref:String, account: &signer) acquires UsernameTable, ProfileTable {
+    public entry fun create_profile(account: &signer, username: String, full_name: String, bio:String, profile_image_ref:String ) acquires UsernameTable, ProfileTable {
 
         assert!(length(&username) > 0, 01);
         assert!(length(&full_name) > 0, 02);
@@ -55,8 +55,6 @@ module wizz_addr::wizz {
         let profile_table = borrow_global_mut<ProfileTable>(signer_address);
         let username_table = borrow_global_mut<UsernameTable>(signer_address);
 
-        // let profile_uid = object::new(ctx);
-        // let profile_id = object::uid_to_address(&profile_uid);
         let profile_id = object::create_object_address(&signer_address, NAME );
 
         let profile: Profile = Profile {
