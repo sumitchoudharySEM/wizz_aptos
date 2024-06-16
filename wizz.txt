@@ -1,0 +1,154 @@
+module wizz_addr::wizz {
+
+    use std::string::{String, length};
+    use std::vector;
+    use aptos_std::table::{Self, Table};
+    use aptos_std::address;
+    use aptos_framework::signer;
+
+    // Struct to represent a user profile.
+    struct Profile has key {
+        id: u64,
+        profile_id: address,
+        username: String,
+        full_name: String,
+        owner: address,
+        bio: String,
+        profile_image_ref: String,
+        followings: vector<address>
+    }
+
+    // Struct to represent a post.
+    struct Post has key {
+        id: u64,
+        post_id: address,
+        owner: address,
+        owner_profile_id: address,
+        content: String,
+        likes: u64,
+        image: String,
+    }
+
+    // Global table to store all usernames.
+    struct UsernameTable has key {
+        usernames: table::Table<String, bool>,
+    }
+
+    // Global table to store all profiles.
+    struct ProfileTable has key {
+        profile_addresses: table::Table<u64, address>,
+    }
+
+    // Global table to store all posts.
+    struct PostTable has key {
+        post_addresses: table::Table<u64, address>,
+    }
+
+    // Initialize the ProfileTable. This should be called once during deployment.
+    public entry fun init(account: &signer) {
+        let profile_table = ProfileTable {
+            profile_addresses: table::new<address>(),
+        };
+        let post_table = PostTable {
+            post_addresses: Table::new<address>(),
+        };
+        let username_table = UsernameTable {
+            usernames: Table::new<bool>(),
+        };
+        move_to(account, profile_table);
+        move_to(account, post_table);
+        move_to(account, username_table);
+    }
+
+    // Initialize a new profile.
+    public entry fun create_profile(account: &signer, username: String, full_name: String, bio: String, profile_image_ref: String) {
+        assert!(length(&username) > 0, 01);
+        assert!(length(&full_name) > 0, 02);
+        assert!(length(&bio) > 0, 03);
+        assert!(length(&profile_image_ref) > 0, 04);
+
+        let username_table = borrow_global_mut<UsernameTable>(signer::address_of(account));
+
+        let sender = signer::address_of(account);
+        let profile_id = core_address::create_resource_address(account);
+
+        let profile = Profile {
+            id: profile_id ,
+            profile_id,
+            username,
+            full_name,
+            owner: sender,
+            profile_image_ref,
+            bio,
+            followings: vector::empty<address>(),
+        };
+
+        let profile_table = borrow_global_mut<ProfileTable>(sender);
+        let id = profile_id ;
+        table::add(&mut profile_table.profile_addresses, id, profile_id);
+        table::add(&mut username_table.usernames, username, true);
+        
+        move_to(account, profile);
+    }
+
+    // Follow a profile.
+    public entry fun follow_profile(account: &signer, profile_id_to_follow: address) {
+        let sender = signer::address_of(account);
+        let profile = borrow_global_mut<Profile>(sender);
+
+        assert!(profile.profile_id != profile_id_to_follow, 11);
+
+        vector::push_back(&mut profile.followings, profile_id_to_follow);
+    }
+
+    // Unfollow a profile.
+    public entry fun unfollow_profile(account: &signer, profile_id_to_unfollow: address) {
+        let sender = signer::address_of(account);
+        let profile = borrow_global_mut<Profile>(sender);
+
+        assert!(profile.profile_id != profile_id_to_unfollow, 21);
+
+        let followings = &mut profile.followings;
+        let len = vector::length(followings);
+        let i = 0;
+        while (i < len) {
+            if (vector::borrow(followings, i) == &profile_id_to_unfollow) {
+                vector::remove(followings, i);
+                break;
+            };
+            i = i + 1;
+        };
+    }
+
+    // Initialize a new post.
+    public entry fun create_post(account: &signer, content: String, image: String) {
+        assert!(length(&content) > 0, 31);
+
+        let sender = signer::address_of(account);
+        let post_id = core_address::create_resource_address(account);
+
+        let profile = borrow_global<Profile>(sender);
+
+        let post = Post {
+            id: post_id ,
+            post_id,
+            owner: sender,
+            owner_profile_id: profile.profile_id,
+            content,
+            likes: 0,
+            image,
+        };
+
+        let post_table = borrow_global_mut<PostTable>(sender);
+        let id = post_id;
+        table::add(&mut post_table.post_addresses, id, post_id);
+        
+        move_to(account, post);
+    }
+
+    // Like a post.
+    public entry fun like_post(account: &signer, post_id: address) {
+        let post = borrow_global_mut<Post>(post_id);
+        post.likes = post.likes + 1;
+    }
+}
