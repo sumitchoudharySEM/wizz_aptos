@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const Profile = ({ userProfile }) => {
   return (
-    <Link href={`/profile/${userProfile.profile_object_id}`}>
+    <Link href={`/profile/${userProfile.owner}`}>
     <div className="mb-6 rounded-b-xl bg-[#3C404B] px-10 py-7 flex space-x-4 align-middle">
       
       <div className="">
