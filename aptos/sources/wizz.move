@@ -6,8 +6,6 @@ module wizz_addr::wizz {
     use aptos_framework::object;
     use aptos_std::table::{Self, Table};
 
-
-    // Struct to represent a user profile.
     struct Profile has key, store {
         profile_id: address,
         username: String,
@@ -18,7 +16,6 @@ module wizz_addr::wizz {
         followings: vector<address>
     }
 
-    // Struct to represent a post.
     struct Post has  store, copy, drop{
         post_id : u64,
         owner : address,
@@ -27,17 +24,14 @@ module wizz_addr::wizz {
         likes : u64,
     }
 
-    // Global table to store all usernames.
     struct UsernameTable has key {
        usernames: vector<String>,
     }
 
-    // Global table to store all profiles.
     struct ProfileTable has key {
         profile_addresses: vector<address>,
     }
 
-    // Global table to store all posts.
     struct PostTable has key {
         posts: Table<u64, Post>,
         post_counter : u64,
@@ -45,7 +39,6 @@ module wizz_addr::wizz {
 
     const NAME: vector<u8> = b"Object";
 
-    // Initialize the Tables
     public entry fun init(account: &signer) {
         let profile_table = ProfileTable {
             profile_addresses: vector::empty<address>(),
@@ -62,7 +55,6 @@ module wizz_addr::wizz {
         move_to(account, post_table);
     }
 
-    // Initialize a new profile.
     public entry fun create_profile(account: &signer, contract_owner: address, username: String, full_name: String, bio:String, profile_image_ref:String ) acquires UsernameTable, ProfileTable {
 
         assert!(length(&username) > 0, 01);
@@ -92,22 +84,21 @@ module wizz_addr::wizz {
         move_to(account, profile);
     }
 
-    // Follow a profile.
-    public entry fun follow_profile(account: &signer, profile_to_follow: address) acquires Profile{
+    public entry fun follow_profile(account: &signer, profile_to_follow: address) acquires Profile {
         let follower_address = signer::address_of(account);
         let profile = borrow_global_mut<Profile>(follower_address);
         vector::push_back(&mut profile.followings, profile_to_follow);
     }
 
-    // Unfollow a profile.
-    public entry fun unfollow_profile(account: &signer, profile_to_unfollow: address) {
+    public entry fun unfollow_profile(account: &signer, profile_to_unfollow: address) acquires Profile {
         let follower_address = signer::address_of(account);
         let profile = borrow_global_mut<Profile>(follower_address);
-        
+        let followings = &mut profile.followings;
+
         let len = vector::length(followings);
         let i = 0;
         while (i < len) {
-            if (vector::borrow(followings, i) == profile_id_to_unfollow) {
+            if (vector::borrow(followings, i) == &profile_to_unfollow) {
                 vector::remove(followings, i);
                 break
             };
@@ -115,7 +106,6 @@ module wizz_addr::wizz {
         };
     }
 
-    // Create a new post.
     public entry fun create_post(account: &signer, contract_owner: address, content: String, image_ref: String) acquires PostTable {
         assert!(length(&content) > 0, 05);
 
@@ -135,11 +125,10 @@ module wizz_addr::wizz {
         post_table.post_counter = post_id;
     }
 
-    // Like a post.
-    public entry fun like_post(account: &signer, contract_owner: address, post_id: u64) acquires PostTable {
+    public entry fun like_post( contract_owner: address, post_id: u64) acquires PostTable {
         let post_table = borrow_global_mut<PostTable>(contract_owner);
-        let post = table::get_mut(&mut post_table.posts, post_id);
-        post.likes += 1;
+        let post = table::borrow_mut(&mut post_table.posts, post_id);
+        post.likes = post.likes + 1;
     }
 
 }
