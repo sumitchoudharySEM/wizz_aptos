@@ -4,8 +4,7 @@ import { Featured } from "@/components";
 const Feeds = () => {
   return (
     <>
-      {/* <Featured /> */}
-      <h1>Feeds</h1>
+      <Featured />
     </>
   );
 };
