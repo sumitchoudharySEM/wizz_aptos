@@ -35,13 +35,12 @@ const AllProfiles = () => {
         resourceType: `${MODULEADDRESS}::wizz::Profile`,
       });
       
-      setAllProfilesAddress({
+      setUserProfile({
         owner : ProfileResource.owner,
         name : ProfileResource.full_name,
         username : ProfileResource.username,
         bio : ProfileResource.bio,
         image_cid : ProfileResource.profile_image_ref,
-        profile_object_id : ProfileResource.profile_id,
         following : ProfileResource.followings,
       });
       console.log("ProfileResource", ProfileResource);
