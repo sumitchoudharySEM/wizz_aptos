@@ -55,7 +55,7 @@ const Featured = () => {
         });
         counter++;
       }
-      setAllPosts(Posts);
+      setAllPosts(Posts.reverse());
     } catch (e) {
       console.log("error", e);
     }

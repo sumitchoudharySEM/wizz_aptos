@@ -65,7 +65,7 @@ const ShortProfile = (props) => {
   return (
     <>
       <div className=" py-2 flex space-x-4 align-middle justify-between ">
-        <Link href={`/profile/${user.profile_object_id}`} passHref>
+        <Link href={`/profile/${user.owner}`} passHref>
           <div className="flex space-x-4 align-middle">
             <div className="">
               <img
