@@ -2,6 +2,7 @@
 
 import {
   MODULEADDRESS,
+  CONTRACTOWNERADDRESS,
   PINATA_JWT,
   NEXT_PUBLIC_GATEWAY_URL,
 } from "./constants";
@@ -93,7 +94,7 @@ export default function Home() {
   useEffect(() => {
     console.log("accountHasProfile", accountHasProfile);
     if (account && account.address && accountHasProfile == true) {
-      // redirect("/feeds");
+      redirect("/feeds");
     }
   }, [accountHasProfile, account?.address]);
 
@@ -160,15 +161,14 @@ export default function Home() {
                     onClick={async () => {
                       if (!account) return;
                       try {
-                        // const cid = await handleSubmission();
-                        const cid = "QmRzavDxW1zWXrP3W8mw4jCnVPvZxe1HZvbzcE167Tw1kJ";
+                        const cid = await handleSubmission();
                         console.log("CID", cid);
 
                         const transaction: InputTransactionData = {
                           data: {
                             function: `${MODULEADDRESS}::wizz::create_profile`,
                             functionArguments: [
-                              MODULEADDRESS,
+                              CONTRACTOWNERADDRESS,
                               user.username,
                               user.name,
                               user.bio,
@@ -186,7 +186,7 @@ export default function Home() {
                         });
                         setAccountHasProfile(true);
 
-                        // redirect("/feeds");
+                        redirect("/feeds");
                       } catch (error) {
                         console.error("Error during submission:", error);
                       }
