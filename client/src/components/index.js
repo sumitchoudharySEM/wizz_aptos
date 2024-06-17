@@ -1,7 +1,8 @@
 
 import Sidebar from './sidebar';
 import RightSidebar from './rightSideBar'
+import CreatePost from './CreatePost'
 
 
 
-export { Sidebar,RightSidebar, };
+export { Sidebar,RightSidebar, CreatePost };

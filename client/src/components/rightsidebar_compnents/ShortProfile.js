@@ -101,6 +101,7 @@ const ShortProfile = (props) => {
                   transactionHash: response.hash,
                 });
                 toggleFollow();
+                toast.success("Unfollowed successfully");
               }}
               className=" border-[1px] py-2 border-white px-7 w-full text-sm text-white  rounded-full font-medium"
             >
@@ -122,6 +123,7 @@ const ShortProfile = (props) => {
                   transactionHash: response.hash,
                 });
                 toggleFollow();
+                toast.success("Followed successfully");
               }}
               className="bg-[#7501E9] py-2 px-7 w-full text-sm text-white border-none rounded-full font-medium"
             >

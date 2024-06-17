@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import "./dashboard_layout.css";
 import { MODULEADDRESS } from "../constants";
-import { Sidebar, RightSidebar } from "@/components";
+import { Sidebar, RightSidebar, CreatePost } from "@/components";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
@@ -126,8 +126,8 @@ export default function UserInfoLayout({ children }) {
               <Sidebar setClicked={setClicked} userProfile={userProfile} />
             </div>
             <div className="lg:w-[55%] md:w-[65%] w-full  h-full flex flex-col  items-center  align-middle bg-[#14161b]">
-              {isClicked == 1 ? ( <></>
-                // <CreatePost setClicked={setClicked} userProfile={userProfile} />
+              {isClicked == 1 ? ( 
+                <CreatePost setClicked={setClicked} userProfile={userProfile} />
               ) : null}
 
               {isSidebar ? (
